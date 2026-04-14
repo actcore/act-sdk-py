@@ -19,7 +19,9 @@ _tool_registry: dict[str, ToolInfo] = {}
 def component(cls: type) -> type:
     """Register a class as the ACT component.
 
-    Scans for @tool-decorated methods and registers them.
+    Scans for @tool-decorated methods, registers them, and injects the
+    WIT ToolProvider bridge into the caller's module so componentize-py
+    can find the export automatically.
     """
     global _registered_component, _tool_registry
 
@@ -32,6 +34,15 @@ def component(cls: type) -> type:
         if callable(attr) and hasattr(attr, "_act_tool"):
             info: ToolInfo = attr._act_tool
             _tool_registry[info.name] = info
+
+    # Inject WIT bridge into component's module for componentize-py
+    import sys
+
+    from act_sdk.bridge import ToolProvider
+
+    module = sys.modules.get(cls.__module__)
+    if module is not None:
+        setattr(module, "ToolProvider", ToolProvider)
 
     return cls
 
@@ -53,7 +64,9 @@ def get_tool_definitions() -> list[tuple[str, str, str, list[tuple[str, bytes]]]
     return defs
 
 
-async def dispatch_tool(name: str, arguments: bytes) -> tuple[bytes, str] | tuple[str, str, str]:
+async def dispatch_tool(
+    name: str, arguments: bytes
+) -> tuple[bytes, str] | tuple[str, str, str]:
     """Dispatch a tool call. Returns (data, mime) on success or (kind, message, "error") on error."""
     info = _tool_registry.get(name)
     if info is None:
