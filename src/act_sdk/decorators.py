@@ -38,7 +38,7 @@ def tool(
 
     def decorator(func: Callable) -> Callable:
         schema = params_schema(func)
-        tool_name = func.__name__.replace("_", "-")
+        tool_name = func.__name__
 
         info = ToolInfo(
             name=tool_name,
