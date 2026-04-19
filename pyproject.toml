@@ -22,7 +22,7 @@ Issues = "https://github.com/actcore/act-sdk-py/issues"
 [dependency-groups]
 dev = [
     "mypy>=1.20.0",
-    "pytest>=9.0",
+    "pytest>=9.0.3",
     "ruff>=0.15",
     "ty>=0.0.27",
 ]
