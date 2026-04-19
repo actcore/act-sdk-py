@@ -43,16 +43,20 @@ Tool method names are exposed as-is (snake_case). `async def get_weather(...)` b
 
 ## Capabilities
 
-Declare host capabilities in `act.toml`:
+Declare host capabilities inline in `pyproject.toml`:
 
 ```toml
-[std]
+[project]
 name = "my-component"
+version = "0.1.0"
+description = "..."
 
-[std.capabilities."wasi:http"]
+[tool.act.std.capabilities."wasi:http"]
 ```
 
-The component cannot reach the network unless the host links `wasi:http` at load time. Filesystem, sockets, and other WASI capabilities follow the same pattern.
+`act-build pack` picks up `[tool.act]` and embeds it in the component's `act:component` custom section. The component cannot reach the network unless the host links `wasi:http` at load time. Filesystem, sockets, and other WASI capabilities follow the same pattern.
+
+A separate `act.toml` also works as a last-wins override layer if you need to keep capability metadata out of your build configuration — but for most components, inline `pyproject.toml` is the recommended source of truth.
 
 ## Links
 
