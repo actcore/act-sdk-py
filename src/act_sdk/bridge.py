@@ -21,11 +21,13 @@ import traceback
 
 from wit_world import exports
 from wit_world.imports.types import (
+    Error,
+    LocalizedString_Plain,
+)
+from wit_world.exports.tool_provider import (
     ContentPart,
     ListToolsResponse,
-    LocalizedString_Plain,
     ToolDefinition,
-    ToolError,
     ToolEvent_Content,
     ToolEvent_Error,
     ToolResult_Immediate,
@@ -36,9 +38,6 @@ from act_sdk.provider import dispatch_tool, get_tool_definitions
 
 class ToolProvider(exports.ToolProvider):
     """componentize-py export — bridges WIT interface to @component/@tool registry."""
-
-    async def get_metadata_schema(self, metadata):
-        return None
 
     async def list_tools(self, metadata):
         defs = get_tool_definitions()
@@ -55,13 +54,13 @@ class ToolProvider(exports.ToolProvider):
             ],
         )
 
-    async def call_tool(self, call):
+    async def call_tool(self, name, arguments, metadata):
         try:
-            result = await dispatch_tool(call.name, bytes(call.arguments))
+            result = await dispatch_tool(name, bytes(arguments))
             if len(result) == 3 and result[2] == "error":
                 kind, message, _ = result
                 event = ToolEvent_Error(
-                    ToolError(
+                    Error(
                         kind=kind,
                         message=LocalizedString_Plain(value=message),
                         metadata=[],
@@ -78,7 +77,7 @@ class ToolProvider(exports.ToolProvider):
                 )
         except Exception:
             event = ToolEvent_Error(
-                ToolError(
+                Error(
                     kind="std:internal",
                     message=LocalizedString_Plain(value=traceback.format_exc()),
                     metadata=[],

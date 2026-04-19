@@ -4,7 +4,7 @@ requires-python = ">=3.12"
 
 [[package]]
 name = "act-sdk"
-version = "0.1.1"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "cbor2" },
@@ -19,7 +19,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "cbor2", specifier = ">=5.9.0" }]
+requires-dist = [{ name = "cbor2", specifier = ">=5.9.0,<6" }]
 
 [package.metadata.requires-dev]
 dev = [
